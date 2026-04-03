@@ -77,7 +77,23 @@ Recommended GCP access:
 
 ## Install
 
-### Option 1: Download a prebuilt release binary
+### Option 1: Linux one-line install
+
+Linux users can install the latest release with:
+
+```bash
+curl -fsSL https://github.com/KingHanzala/gcpsec/releases/latest/download/install.sh | sh
+```
+
+This downloads the correct Linux archive for `amd64` or `arm64` and installs `gcpsec` into `/usr/local/bin`.
+
+If you want a different location:
+
+```bash
+curl -fsSL https://github.com/KingHanzala/gcpsec/releases/latest/download/install.sh | INSTALL_DIR="$HOME/.local/bin" sh
+```
+
+### Option 2: Download a prebuilt release binary
 
 No Go installation required.
 
@@ -97,7 +113,7 @@ gcpsec version
 
 Release assets are built automatically by GitHub Actions when a tag like `v0.1.0` is pushed. They are uploaded to GitHub Releases together with checksum files.
 
-### Option 2: Install with Go
+### Option 3: Install with Go
 
 Install from GitHub:
 

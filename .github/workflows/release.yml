@@ -103,12 +103,22 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: release-*
           merge-multiple: true
           path: release-assets
+
+      - name: Add installer scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp scripts/install.sh release-assets/install.sh
+          chmod +x release-assets/install.sh
 
       - name: Create checksums bundle
         shell: bash
