@@ -1,4 +1,4 @@
-# gcp-sec
+# gcpsec
 
 <p align="center">
   <img alt="Go" src="https://img.shields.io/badge/Go-1.23.5+-00ADD8?logo=go&logoColor=white">
@@ -7,7 +7,7 @@
   <img alt="Status" src="https://img.shields.io/badge/Status-MVP-success">
 </p>
 
-`gcp-sec` is a developer-first GCP security scanner for catching risky project configuration before deployment.
+`gcpsec` is a developer-first GCP security scanner for catching risky project configuration before deployment.
 
 It currently scans:
 
@@ -15,7 +15,7 @@ It currently scans:
 - Cloud Storage buckets
 - Compute Engine firewall rules
 
-The CLI is built in Go and supports `scan`, `doctor`, and `version`.
+The CLI is built in Go and supports `scan`, `doctor`, `uninstall-info`, and `version`.
 
 ## Overview
 
@@ -23,6 +23,7 @@ The CLI is built in Go and supports `scan`, `doctor`, and `version`.
 - Human-readable findings with recommendations
 - Policy overrides via optional `config.yaml`
 - CI-friendly exit codes for blocking risky changes
+- Installable with `go install github.com/kinghanzala/gcpsec@latest`
 
 ## What It Checks
 
@@ -74,6 +75,86 @@ Recommended GCP access:
 - `Viewer`
 - `Security Reviewer` (optional, depending on your environment)
 
+## Install
+
+### Option 1: Download a prebuilt release binary
+
+No Go installation required.
+
+1. Open the GitHub Releases page for this repository.
+2. Download the archive matching your OS and CPU architecture.
+3. Extract the archive.
+4. Move the `gcpsec` binary somewhere on your `PATH`, such as `/usr/local/bin`.
+
+Example for macOS or Linux after downloading a release asset:
+
+```bash
+tar -xzf gcpsec_0.1.0_darwin_arm64.tar.gz
+chmod +x gcpsec
+sudo mv gcpsec /usr/local/bin/gcpsec
+gcpsec version
+```
+
+Release assets are built automatically by GitHub Actions when a tag like `v0.1.0` is pushed. They are uploaded to GitHub Releases together with checksum files.
+
+### Option 2: Install with Go
+
+Install from GitHub:
+
+```bash
+go install github.com/kinghanzala/gcpsec@latest
+```
+
+After installation, run the binary as:
+
+```bash
+gcpsec version
+```
+
+If `zsh` says `command not found: gcpsec`, your Go bin directory is probably not on `PATH`.
+
+Add it to `~/.zshrc`:
+
+```bash
+echo 'export PATH="$(go env GOPATH)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+You can also run the installed binary directly:
+
+```bash
+"$(go env GOPATH)/bin/gcpsec" version
+```
+
+Notes:
+
+- Module path and repository path: `github.com/kinghanzala/gcpsec`
+- Installed binary name: `gcpsec`
+- CLI display name in help/version output: `gcpsec`
+
+For `go install ...@latest` to work for other users, the repository must be public and pushed to GitHub.
+
+## Uninstall
+
+See the uninstall command for your machine:
+
+```bash
+gcpsec uninstall-info
+```
+
+Example output:
+
+```bash
+Installed binary: /Users/you/go/bin/gcpsec
+Uninstall with: rm -f "/Users/you/go/bin/gcpsec"
+```
+
+If you already know the binary is on your `PATH`, the fastest option is:
+
+```bash
+rm -f "$(command -v gcpsec)"
+```
+
 ## Build
 
 Run locally:
@@ -85,7 +166,7 @@ go run . version
 Build a binary:
 
 ```bash
-go build -o bin/gcp-sec .
+go build -o bin/gcpsec .
 ```
 
 Run tests:
@@ -98,6 +179,24 @@ GOCACHE=/tmp/go-build go test ./...
 
 ### Scan a project
 
+If installed from a prebuilt release:
+
+```bash
+gcpsec scan --project my-project
+```
+
+If installed with `go install`:
+
+```bash
+gcpsec scan --project my-project
+```
+
+Or, if Go bin is not yet on `PATH`:
+
+```bash
+"$(go env GOPATH)/bin/gcpsec" scan --project my-project
+```
+
 ```bash
 go run . scan --project my-project
 ```
@@ -105,13 +204,13 @@ go run . scan --project my-project
 Or with a built binary:
 
 ```bash
-./bin/gcp-sec scan --project my-project
+./bin/gcpsec scan --project my-project
 ```
 
 Use a policy file:
 
 ```bash
-./bin/gcp-sec scan --project my-project --config ./config.yaml
+./bin/gcpsec scan --project my-project --config ./config.yaml
 ```
 
 Behavior:
@@ -125,13 +224,31 @@ Behavior:
 Validate local prerequisites:
 
 ```bash
-./bin/gcp-sec doctor
+gcpsec doctor
+```
+
+Or from the built binary:
+
+```bash
+./bin/gcpsec doctor
 ```
 
 ### Version
 
 ```bash
-./bin/gcp-sec version
+gcpsec version
+```
+
+Or from the built binary:
+
+```bash
+./bin/gcpsec version
+```
+
+### Uninstall Info
+
+```bash
+gcpsec uninstall-info
 ```
 
 ## Example Output
@@ -153,7 +270,7 @@ INFO: 1
 
 ## Policy Configuration
 
-`config.yaml` is optional. If it is missing, `gcp-sec` runs with built-in default severities.
+`config.yaml` is optional. If it is missing, `gcpsec` runs with built-in default severities.
 
 Example:
 
@@ -187,7 +304,17 @@ Supported behavior:
 
 ```yaml
 - name: GCP Security Scan
-  run: ./bin/gcp-sec scan --project=my-project
+  run: ./bin/gcpsec scan --project=my-project
+```
+
+If your CI installs with Go instead of using a checked-in binary:
+
+```yaml
+- name: Install gcpsec
+  run: go install github.com/kinghanzala/gcpsec@latest
+
+- name: GCP Security Scan
+  run: gcpsec scan --project=my-project
 ```
 
 ## Project Layout
@@ -214,3 +341,23 @@ Current MVP focus:
 - CI-friendly exit codes
 
 Planned future areas include service account checks, multi-project scans, and machine-readable output formats.
+
+## Releases
+
+For stable `@latest` installs:
+
+- Publish the repository at `github.com/kinghanzala/gcpsec`
+- Create semantic version tags such as `v0.1.0`, `v0.2.0`, and `v1.0.0`
+- Push tags to GitHub so `go install ...@latest` resolves to the newest release version
+- Pushing a version tag also triggers the GitHub Actions release workflow in [.github/workflows/release.yml](/Users/kinghanzala/gcpsec/.github/workflows/release.yml)
+- The workflow runs tests, builds release archives for macOS, Linux, and Windows, and uploads them to the GitHub Release page
+
+Without release tags, Go may install a pseudo-version derived from the latest commit instead of a clean semver release.
+
+## Future Rename Option
+
+If you later want the install path to be:
+
+```bash
+go install github.com/kinghanzala/gcpsec@latest
+```
