@@ -124,6 +124,7 @@ jobs:
         run: |
           set -euo pipefail
           cp scripts/install.sh release-assets/install.sh
+          cp scripts/install.ps1 release-assets/install.ps1
           chmod +x release-assets/install.sh
 
       - name: Create checksums bundle

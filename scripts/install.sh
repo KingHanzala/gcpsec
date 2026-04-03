@@ -3,7 +3,9 @@ set -eu
 
 REPO="KingHanzala/gcpsec"
 BINARY_NAME="gcpsec"
-INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
+DEFAULT_USER_BIN="${HOME}/.local/bin"
+DEFAULT_SYSTEM_BIN="/usr/local/bin"
+INSTALL_DIR="${INSTALL_DIR:-}"
 
 need_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -51,6 +53,14 @@ LATEST_URL="https://github.com/${REPO}/releases/latest/download"
 ARCHIVE_NAME="${BINARY_NAME}_linux_${GOARCH}.tar.gz"
 ARCHIVE_PATH="${TMP_DIR}/${ARCHIVE_NAME}"
 
+if [ -z "${INSTALL_DIR}" ]; then
+  if [ -d "${DEFAULT_SYSTEM_BIN}" ] && [ -w "${DEFAULT_SYSTEM_BIN}" ]; then
+    INSTALL_DIR="${DEFAULT_SYSTEM_BIN}"
+  else
+    INSTALL_DIR="${DEFAULT_USER_BIN}"
+  fi
+fi
+
 echo "Downloading ${ARCHIVE_NAME}..."
 sh -c "${DOWNLOADER} \"${LATEST_URL}/${ARCHIVE_NAME}\" > \"${ARCHIVE_PATH}\""
 
@@ -60,4 +70,12 @@ mkdir -p "${INSTALL_DIR}"
 install -m 0755 "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
 
 echo "Installed ${BINARY_NAME} to ${INSTALL_DIR}/${BINARY_NAME}"
+case ":${PATH}:" in
+  *:"${INSTALL_DIR}":*)
+    ;;
+  *)
+    echo "Add this to your shell profile if needed:"
+    echo "export PATH=\"${INSTALL_DIR}:\$PATH\""
+    ;;
+esac
 echo "Run: ${BINARY_NAME} version"

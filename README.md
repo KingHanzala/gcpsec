@@ -85,7 +85,11 @@ Linux users can install the latest release with:
 curl -fsSL https://github.com/KingHanzala/gcpsec/releases/latest/download/install.sh | sh
 ```
 
-This downloads the correct Linux archive for `amd64` or `arm64` and installs `gcpsec` into `/usr/local/bin`.
+This downloads the correct Linux archive for `amd64` or `arm64` and installs `gcpsec` into:
+
+- `/usr/local/bin` if it is writable
+- otherwise `~/.local/bin`
+
 This works for releases that include the Linux alias assets published by the release workflow.
 
 If you want a different location:
@@ -94,7 +98,29 @@ If you want a different location:
 curl -fsSL https://github.com/KingHanzala/gcpsec/releases/latest/download/install.sh | INSTALL_DIR="$HOME/.local/bin" sh
 ```
 
-### Option 2: Download a prebuilt release binary
+After install, the script prints a `PATH` export line if your chosen install directory is not already on `PATH`.
+
+### Option 2: Windows one-line install
+
+Windows users can install the latest release in PowerShell with:
+
+```powershell
+iwr https://github.com/KingHanzala/gcpsec/releases/latest/download/install.ps1 -UseBasicParsing | iex
+```
+
+This downloads the correct Windows archive for `amd64` or `arm64` and installs `gcpsec.exe` into:
+
+- `%USERPROFILE%\AppData\Local\Microsoft\WindowsApps` by default
+- or a custom directory if `INSTALL_DIR` is set before running the command
+
+Example with a custom install directory:
+
+```powershell
+$env:INSTALL_DIR = "$HOME\AppData\Local\gcpsec"
+iwr https://github.com/KingHanzala/gcpsec/releases/latest/download/install.ps1 -UseBasicParsing | iex
+```
+
+### Option 3: Download a prebuilt release binary
 
 No Go installation required.
 
@@ -114,7 +140,7 @@ gcpsec version
 
 Release assets are built automatically by GitHub Actions when a tag like `v0.1.0` is pushed. They are uploaded to GitHub Releases together with checksum files.
 
-### Option 3: Install with Go
+### Option 4: Install with Go
 
 Install from GitHub:
 
