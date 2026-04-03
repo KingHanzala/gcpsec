@@ -86,6 +86,7 @@ curl -fsSL https://github.com/KingHanzala/gcpsec/releases/latest/download/instal
 ```
 
 This downloads the correct Linux archive for `amd64` or `arm64` and installs `gcpsec` into `/usr/local/bin`.
+This works for releases that include the Linux alias assets published by the release workflow.
 
 If you want a different location:
 

@@ -92,6 +92,12 @@ jobs:
 
           sha256sum "${archive_path}" > "${archive_path}.sha256"
 
+          if [ "${GOOS}" = "linux" ]; then
+            latest_archive="pkg/${binary_name}_linux_${GOARCH}.tar.gz"
+            cp "${archive_path}" "${latest_archive}"
+            sha256sum "${latest_archive}" > "${latest_archive}.sha256"
+          fi
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
