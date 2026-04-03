@@ -5,6 +5,8 @@ import (
 	"context"
 	"errors"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -65,6 +67,34 @@ func TestVersionPrintsBuildInfo(t *testing.T) {
 	got := buf.String()
 	if !strings.Contains(got, "version=1.2.3") {
 		t.Fatalf("expected version in output, got %q", got)
+	}
+}
+
+func TestUninstallInfoPrintsInstalledPath(t *testing.T) {
+	dir := t.TempDir()
+	binaryPath := filepath.Join(dir, "gcpsec")
+	if err := os.WriteFile(binaryPath, []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	originalPath := os.Getenv("PATH")
+	t.Setenv("PATH", dir+string(os.PathListSeparator)+originalPath)
+
+	cmd := newUninstallInfoCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+
+	got := buf.String()
+	if !strings.Contains(got, "Installed binary: "+binaryPath) {
+		t.Fatalf("expected installed binary path, got %q", got)
+	}
+	if !strings.Contains(got, "Uninstall with: rm -f ") {
+		t.Fatalf("expected uninstall command, got %q", got)
 	}
 }
 

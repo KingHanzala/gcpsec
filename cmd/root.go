@@ -10,7 +10,7 @@ type BuildInfo struct {
 
 func NewRootCmd(build BuildInfo) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:           "gcp-sec",
+		Use:           "gcpsec",
 		Short:         "Developer-first GCP security scanner",
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -18,6 +18,7 @@ func NewRootCmd(build BuildInfo) *cobra.Command {
 
 	rootCmd.AddCommand(newScanCmd())
 	rootCmd.AddCommand(newDoctorCmd())
+	rootCmd.AddCommand(newUninstallInfoCmd())
 	rootCmd.AddCommand(newVersionCmd(build))
 
 	return rootCmd
